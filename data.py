@@ -1,41 +1,29 @@
-import csv
-from typing import List
+import numpy as np
 
-class dataReader:
-    def __init__(self, _filePath):
-        """Data reader for a csv dataset
+class Data:
+    def __init__(self, filePath):
+        self.filePath = filePath
+        self.__LoadData()
 
-        Args:
-            _filePath (string): path to dataset csv file. 
-        """
-        self.filePath = _filePath
-        self.header = None
+    def __LoadData(self):
+        print("Loading data...")
+        data = np.genfromtxt("./DB_Collusion_All_processed.csv", delimiter=",", skip_header=1)
 
-        self.dataset = open(self.filePath, newline='')
-        self.datasetReader = csv.reader(self.dataset, delimiter=',')
+        # create dataset
+        dataset = np.array([data[data[:, 0] == i][:, 1] for i in np.unique(data[:, 0])], dtype=object)
+        labels = np.array([data[data[:, 0] == i][0, 4] for i in np.unique(data[:, 0])], dtype=object)
+        country = np.array([data[data[:, 0] == i][0, -1] for i in np.unique(data[:, 0])], dtype=object)
 
-    def getRows(self, hasHeader = True) -> List[List[str]]:
-        """Extact rows from the dataset.
+        # create test and train data from shuffled dataset
+        indices = np.arange(dataset.shape[0])
+        np.random.shuffle(indices)
 
-        Args:
-            hasHeader (bool, optional): Set to true if dataset contains a header to extract the header to the header variable. Defaults to True.
+        trainIndices = indices[:int(0.8 * dataset.shape[0])]
+        self.trainX = dataset[trainIndices]
+        self.trainY = labels[trainIndices]
 
-        Returns:
-            List[List[str]]: List of rows containing the information of the dataset.
-        """
-        rows = []
-        for row in self.datasetReader:
-            rows.append(row)
-        
-        if hasHeader: self.header = rows[0]
-        return rows[1:]
+        testIndices = indices[int(0.8 * dataset.shape[0]):]
+        self.testX = dataset[testIndices]
+        self.testY = labels[testIndices]
 
-    def __del__(self):
-        self.dataset.close()
-
-
-
-reader = dataReader("../collusion/DB_Collusion_All_processed.csv")
-rows = reader.getRows()
-print(reader.header)
-print(rows[0])
+        print("Data loaded")
