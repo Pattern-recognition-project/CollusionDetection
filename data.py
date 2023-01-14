@@ -68,7 +68,7 @@ class Data:
         Creates one hot encoded columns of the country
         
         """
-        print(self.country[:4])
+
         n_values = np.max(self.country) + 1
         return np.eye(n_values)[self.country] 
 
@@ -90,8 +90,6 @@ class Data:
             *[f"country_{i}" for i in np.unique(self.country)],
             'first_price_auction', 'average_price_auction'
         ]
-
-        print(self.dataset[:4])
 
         agg_data = np.stack(
             [
