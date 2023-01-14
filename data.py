@@ -33,35 +33,31 @@ class Data:
         print("Data loaded")
 
 
-    def __get_data(kind, indices):
+    def __get_data(self, kind, indices):
 
         if kind == 'data':
             return self.dataset[indices]
         else:
             return self.labels[indices]
 
-    def get_train_X():
+    def get_train_X(self):
         return self.__get_data('data', self.indices[:int(0.8 * self.dataset.shape[0])])
 
-    def get_train_y():
+    def get_train_y(self):
         return self.__get_data('labels', self.indices[:int(0.8 * self.dataset.shape[0])])
 
-    def get_test_X():
+    def get_test_X(self):
         return self.__get_data('data', self.indices[int(0.8 * self.dataset.shape[0]):])
 
-    def get_test_y():
+    def get_test_y(self):
         return self.__get_data('labels', self.indices[int(0.8 * self.dataset.shape[0]):])
 
 
     def __proportion(self, arr):
 
         arr = sum([list(str(num)) for num in arr], [])
-
         counts = Counter(arr)
-
-        x = [counts.get(str(i), 0) for i in range(10)]
-
-        return x
+        return [counts.get(str(i), 0) for i in range(10)]
 
     def __country(self):
         """
