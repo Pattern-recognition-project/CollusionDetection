@@ -7,7 +7,7 @@ print("TensorFlow version:", tf.__version__)
 BATCH_SIZE = 32
 
 data = Data("./DB_Collusion_All_processed.csv")
-print(data.trainX[0])
+print(data.get_train_X())
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.InputLayer(input_shape = (1), batch_size=BATCH_SIZE))

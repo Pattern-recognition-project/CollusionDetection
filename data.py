@@ -77,13 +77,15 @@ class Data:
         return self.country != 1
 
 
-    def load_aggegrated(self, data_type='numpy'):
+    def load_aggegrated(self, data_type='numpy', add_labels=False):
 
-        labels = [
+
+        countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan']
+        columns = [
             'num_bids', 'mean', 'variance', 'skew', 'kurtosis',
             'variation', 'min',
             'max', *[f"proportion_{i}" for i in range(10)],
-            *[f"country_{i}" for i in np.unique(self.country)],
+            *[f"is_{countries[i]}" for i in np.unique(self.country)],
             'first_price_auction', 'average_price_auction'
         ]
 
@@ -105,19 +107,33 @@ class Data:
             axis=1
         )
 
+        if add_labels:
+
+            columns = ['labels'] + columns
+            agg_data = np.stack(
+                [
+                    self.labels,
+                    *(agg_data.transpose()),
+                ],
+                axis=1
+            )
+
+
         if data_type == 'numpy':
             return agg_data
         elif data_type == 'pandas':
-            return pd.DataFrame(agg_data, columns=labels)
+            return pd.DataFrame(agg_data, columns=columns)
         elif data_type == 'dict':
-            return pd.DataFrame(agg_data, columns=labels).to_dict('records')
+            return pd.DataFrame(agg_data, columns=columns).to_dict('records')
 
 
 if __name__ == "__main__":
 
     data = Data("./DB_Collusion_All_processed.csv")
 
-    agg_data = data.load_aggegrated(data_type='pandas')
+    agg_data = data.load_aggegrated(data_type='pandas', add_labels=True)
+
+    print(data.get_test_X())
 
 
     print(agg_data)
