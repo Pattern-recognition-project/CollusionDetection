@@ -81,8 +81,8 @@ class Data:
 
     def get_margin(self, auction, difference):
 
-        np.sort(auction)[::-1]
-        return auction[difference] - auction[0]
+        auction = np.sort(auction)[::-1]
+        return auction[0] - auction[difference]
 
 
 
