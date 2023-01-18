@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pickle
 
 from scipy.stats import moment, skew, kurtosis, variation
 from collections import Counter
@@ -142,16 +143,15 @@ if __name__ == "__main__":
 
     data = Data("./DB_Collusion_All_processed.csv")
 
-    agg_data = data.load_aggegrated(data_type='pandas', add_labels=True)
+    # agg_data = data.load_aggegrated(data_type='pandas', add_labels=True)
 
-    print(data.get_test_X())
-
-
-    print(agg_data)
-
-    agg_data.to_csv('test.csv')
+    # print(data.get_test_X())
 
 
+    # print(agg_data)
 
-        
+    # agg_data.to_csv('test.csv')
 
+    with open("DB_Collusion_All_processed.obj","wb") as filehandler:
+        pickle.dump(data, filehandler)
+    
