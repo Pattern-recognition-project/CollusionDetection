@@ -530,10 +530,10 @@ if __name__ == '__main__':
     countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan'] # list index == Dataset number.
 
     #train_results, test_results = moments_logreg()
-    train_results, test_results = shapestatistics_logreg()
+    # train_results, test_results = shapestatistics_logreg()
     #train_results, test_results = includecountry_logreg()
     #train_results, test_results = includecountry_svm()
-    #train_results, test_results = includecoutnry_mlp()
+    train_results, test_results = includecountry_mlp()
     #train_results, test_results = includecountry_rf()
 
     print("TRAIN RESULTS")
