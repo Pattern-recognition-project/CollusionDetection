@@ -77,6 +77,17 @@ class Data:
         return self.country != 1
 
 
+
+    def get_margins_per_country(self):
+
+        for i in range(6):
+
+            country_data = self.dataset[self.country == i]
+
+            print(country_data)
+
+
+
     def load_aggegrated(self, data_type='numpy', add_labels=False):
 
 
