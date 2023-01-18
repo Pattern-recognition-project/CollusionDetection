@@ -79,13 +79,35 @@ class Data:
 
 
 
+    def get_margin(self, auction, difference):
+
+        np.sort(auction)[::-1]
+        return auction[difference] - auction[0]
+
+
+
+
     def get_margins_per_country(self):
 
+        countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan']
+
+        results = []
         for i in range(6):
 
             country_data = self.dataset[self.country == i]
 
-            print(country_data)
+            margin1 = np.mean([self.get_margin(x, 1) for x in country_data if len(x) >= 2])
+            margin2 = np.mean([self.get_margin(x, 2) for x in country_data if len(x) >= 3])
+
+            results.append(
+                {
+                    'name': countries[i],
+                    'margin1': np.around(margin1, decimals=3),
+                    'margin2': np.around(margin2, decimals=3),
+                }
+            )
+
+        return pd.DataFrame(results)
 
 
 
@@ -152,6 +174,13 @@ if __name__ == "__main__":
 
     # agg_data.to_csv('test.csv')
 
-    with open("DB_Collusion_All_processed.obj","wb") as filehandler:
-        pickle.dump(data, filehandler)
+    # with open("DB_Collusion_All_processed.obj","wb") as filehandler:
+    #     pickle.dump(data, filehandler)
+
+    # with open("DB_Collusion_All_processed.obj","rb") as filehandler:
+    #     data = pickle.load(filehandler)
+    
+
+    margins = data.get_margins_per_country()
+    print(margins)
     
