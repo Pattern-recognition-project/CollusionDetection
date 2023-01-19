@@ -17,7 +17,7 @@ import math
 class Net(nn.Module):
     
     def __init__(self, 
-                 numLayersInputSide  =  5, 
+                 numLayersInputSide  =  8, 
                  widthInputSide      = 50, 
                  numLayersOutputSide = 5, 
                  widthOutputSide     = 50, 
@@ -46,7 +46,7 @@ class Net(nn.Module):
         #----------
 
         # NETWORK 2
-        numNewfeatures = 1  # to add the new features as another input to the second model
+        numNewfeatures = 0  # to add the new features as another input to the second model
         numInputs = widthInputSide + numNewfeatures
         numOutputs = widthOutputSide
         
@@ -66,7 +66,7 @@ class Net(nn.Module):
              
     #----------------------------------------
     
-    def forward(self, points, added_features): # added_features are the variables like skewness, kurtosis, etc
+    def forward(self, points): #, added_features): # added_features are the variables like skewness, kurtosis, etc
         # points is one batch, so a collection of auctions: each auction is an array of arrays (the internal ones are the bids)
 
     
@@ -107,7 +107,7 @@ class Net(nn.Module):
             # here we should add added_features, an array of 26 elements for each auction
 
             h = output
-            new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
+            # new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
 
             for layerIndex, layer in enumerate(self.outputSideLayers):
 

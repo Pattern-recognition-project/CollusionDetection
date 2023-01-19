@@ -52,7 +52,7 @@ minibatchSize = 32
 # number of training epochs
 numEpochs = 10
 
-optimizer = torch.optim.SGD()
+optimizer = optim.SGD(model.parameters(), lr = 0.0001)
 
 trainLosses = []; testLosses = []
 
@@ -125,7 +125,12 @@ for epoch in range(numEpochs):
 model.eval()
 
 out = model.forward(inputTest).data.numpy() 
-# not sure how to interpret this output
+
+# acutal classification: idea
+predictions =[]
+for i in out:
+    if i>=0.5: predictions.append(1)
+    else: predictions.append(0)
 
 
 #plotting the loss
