@@ -52,7 +52,7 @@ minibatchSize = 32
 # number of training epochs
 numEpochs = 10
 
-optimizer = optim.Adam(model.parameters(), lr = 0.0001)
+optimizer = torch.optim.SGD()
 
 trainLosses = []; testLosses = []
 
