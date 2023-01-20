@@ -1,3 +1,6 @@
+# import sys
+# sys.settrace
+
 from data import Data
 import pickle
 
@@ -89,9 +92,14 @@ for epoch in range(numEpochs):
         thisTarget = Variable(
             torch.from_numpy(np.stack([ targetTrain[index] for index in indices ])))
     
+        print('test0')
+
+
         # calculate loss
         loss = lossFunc.forward(output, thisTarget)
         # loss = lossFunc(output, thisTarget)
+
+        print('test')
         
         # accumulate 
         trainLoss += loss

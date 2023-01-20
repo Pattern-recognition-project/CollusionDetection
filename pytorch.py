@@ -122,6 +122,9 @@ for row in range(numRows):
     # convert to float32 to avoid problems with incompatible data types during training
     xvalues.append(xv.astype('float32'))
     
+
+
+
 # calculate ML estimators for each point
 mlEstimators = np.array([ np.var(xv, ddof = 0) for xv in xvalues], dtype = 'float32')
 
@@ -138,7 +141,7 @@ ubEstimators = np.array([ np.var(xv, ddof = 1) for xv in xvalues], dtype = 'floa
                                                test_size=0.20, random_state=42)
 
 
-
+print(inputTrain)
 
 # instantiate the model
 model = Net()
