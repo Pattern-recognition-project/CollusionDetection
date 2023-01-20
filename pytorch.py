@@ -134,7 +134,6 @@ ubEstimators = np.array([ np.var(xv, ddof = 1) for xv in xvalues], dtype = 'floa
                                                trueVariances, 
                                                # mlEstimators,
                                                # trueMeans,
-                                               
                                                np.arange(numRows),
                                                test_size=0.20, random_state=42)
 
@@ -210,7 +209,6 @@ for epoch in range(numEpochs):
         
     trainLoss /= trainSteps
     trainLosses.append(trainLoss)    
-    print("test3")
 
     # evaluate model on test set
     model.eval()
