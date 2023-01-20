@@ -7,20 +7,29 @@ from torch.autograd import Variable
 import operator
 
 import numpy as np
-np.random.seed(1773)
-
+import random 
+import os
 import matplotlib.pyplot as plt
 import math
 
-
+def seed_torch(seed=1029):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+seed_torch()
 
 class Net(nn.Module):
     
     def __init__(self, 
-                 numLayersInputSide  =  8, 
-                 widthInputSide      = 50, 
+                 numLayersInputSide  =  5, 
+                 widthInputSide      = 30, 
                  numLayersOutputSide = 5, 
-                 widthOutputSide     = 50, 
+                 widthOutputSide     = 30, 
                 ):
         
         super(Net, self).__init__()
@@ -63,7 +72,7 @@ class Net(nn.Module):
             self.add_module("oLayer%d" % i, layer)
             
             numInputs = numOutputs 
-             
+        self.dropout = nn.Dropout(0.25)
     #----------------------------------------
     
     def forward(self, points): #, added_features): # added_features are the variables like skewness, kurtosis, etc
@@ -106,7 +115,10 @@ class Net(nn.Module):
             # forward step of the second network
             # here we should add added_features, an array of 26 elements for each auction
 
-            h = output
+            # add dropout layer
+            h = self.dropout(output)
+
+
             # new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
 
             for layerIndex, layer in enumerate(self.outputSideLayers):
@@ -115,6 +127,7 @@ class Net(nn.Module):
                 #     h = layer(h,new_features)
                 # else:
                     # h = layer(h)
+
                 h= layer(h)
                 
                 if layerIndex != len(self.outputSideLayers) - 1:

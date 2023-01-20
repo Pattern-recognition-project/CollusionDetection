@@ -63,16 +63,16 @@ class Data:
     def __country(self):
         """
         Creates one hot encoded columns of the country
-        
+
         """
 
         n_values = np.max(self.country) + 1
-        return np.eye(n_values)[self.country] 
+        return np.eye(n_values)[self.country]
 
     def __average_auction(self):
 
         return self.country == 1
-    
+
     def __winner_auction(self):
 
         return self.country != 1
@@ -111,7 +111,7 @@ class Data:
 
 
 
-    def load_aggegrated(self, data_type='numpy', add_labels=False):
+    def load_aggegrated(self, data_type='numpy', add_labels=False, min_bids=1):
 
 
         countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan']
@@ -141,6 +141,7 @@ class Data:
             axis=1
         )
 
+
         if add_labels:
 
             columns = ['labels'] + columns
@@ -151,6 +152,9 @@ class Data:
                 ],
                 axis=1
             )
+
+        selection = [x >= min_bids for x in agg_data[:,columns.index('num_bids')]]
+        agg_data = agg_data[selection,:]
 
 
         if data_type == 'numpy':
@@ -165,7 +169,7 @@ if __name__ == "__main__":
 
     data = Data("./DB_Collusion_All_processed.csv")
 
-    # agg_data = data.load_aggegrated(data_type='pandas', add_labels=True)
+    agg_data = data.load_aggegrated(data_type='pandas', add_labels=True, min_bids=1)
 
     # print(data.get_test_X())
 
@@ -179,8 +183,7 @@ if __name__ == "__main__":
 
     # with open("DB_Collusion_All_processed.obj","rb") as filehandler:
     #     data = pickle.load(filehandler)
-    
+
 
     margins = data.get_margins_per_country()
     print(margins)
-    

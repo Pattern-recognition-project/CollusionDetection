@@ -3,9 +3,9 @@
 
 from data import Data
 import pickle
-
+import random
+import os
 import numpy as np
-np.random.seed(1773)
 
 import matplotlib.pyplot as plt
 import math
@@ -20,8 +20,26 @@ from sklearn.model_selection import train_test_split
 
 from torch_model_G import Net
 
+from training_function import training_function
 
-from math import sqrt
+
+def seed_torch(seed=1029):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+seed_torch()
+
+def binary_output(output):
+    # actual binary predictions
+    out = output.detach().numpy()
+    return np.where(out>=0.5,1,0)
+
+if __name__ == "__main__":
 
 
 with open("DB_Collusion_All_processed.obj","rb") as filehandler:
@@ -36,48 +54,46 @@ targetTest = data.get_test_y()
 inputTrain = [[[value] for value in auction] for auction in inputTrain]
 inputTest = [[[value] for value in auction] for auction in inputTest]
 
-
 # consider features to be added for the second network
 added_features = data.load_aggegrated()
 added_featuresTrain = added_features[:len(inputTrain)]
 
-# instantiate the model
-model = Net()
 
-allIndices = np.arange(len(targetTrain))
+    #train the model
+    model, output, trainLosses, testLosses= training_function(4, 10, inputTrain, targetTrain, inputTest, targetTest)
 
-# define the loss function
-# lossFunc = nn.BCELoss() #if this is used the sigmoid layer should be added in the second network
-lossFunc = nn.BCEWithLogitsLoss()
 
-minibatchSize = 32
-
-# number of training epochs
-numEpochs = 10
-
-optimizer = optim.SGD(model.parameters(), lr = 0.0001)
-
-trainLosses = []; testLosses = []
-
-# variable for target values of test set
-testTargetVar = Variable(torch.from_numpy(np.stack(targetTest)))
+    predictions = binary_output(output)
 
 
 
 
-print("starting training")
-for epoch in range(numEpochs):
 
-    np.random.shuffle(allIndices)
+    #plotting the loss
+    trainLosses = [trainLosses[i].detach().numpy() for i,_ in enumerate(trainLosses)]
+    testLosses = [testLosses[i].detach().numpy() for i,_ in enumerate(testLosses)]
+
+    plt.plot(trainLosses)
+    plt.plot(testLosses)
+    plt.title('Loss vs Epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('loss')
+    plt.legend(["train loss", "test loss"])
+    plt.show()
+
+    # metrics 
+    true_pred = targetTest.astype(int)
     
-    # put model in training mode
-    model.train()
-    
-    trainLoss  = 0
-    trainSteps = 0
-    
-    for indices in np.array_split(allIndices, minibatchSize):
+    conf_matrix = confusion_matrix(true_pred,predictions)
+    print("Confusion Matrix of the Test Set")
+    print("-----------")
+    print(conf_matrix)
+    print("Accuracy :\t"+str(accuracy_score(true_pred,predictions)))
+    print("Precision :\t"+str(precision_score(true_pred,predictions)))
+    print("Recall :\t"+str(recall_score(true_pred,predictions)))
+    print("F1 Score :\t"+str(f1_score(true_pred,predictions)))
         
+<<<<<<< HEAD
         optimizer.zero_grad()
     
         # forward through the network
@@ -164,4 +180,6 @@ plt.show()
 # print("Recall :\t"+str(recall_score(true_pred,predictions)))
 # print("F1 Score :\t"+str(f1_score(true_pred,predictions)))
     
+=======
+>>>>>>> 1ad8b3683e489f97fbcacbaaf047276051d35f9c
 

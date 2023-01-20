@@ -154,7 +154,7 @@ lossFunc = nn.MSELoss()
 minibatchSize = 32
 
 # number of training epochs
-numEpochs = 40
+numEpochs = 5 #40
 
 optimizer = optim.Adam(model.parameters(), lr = 0.0001)
 
@@ -219,7 +219,7 @@ for epoch in range(numEpochs):
     output = model.forward(inputTest)
             
     # calculate loss on test set
-    testLoss = lossFunc.forward(output, testTargetVar).data[0]
+    testLoss = lossFunc.forward(output, testTargetVar).data  #[0]
 
     testLosses.append(testLoss)
     
@@ -280,7 +280,7 @@ for epoch in range(numEpochs):
         loss = lossFunc.forward(output, thisTarget)
    
         # accumulate 
-        trainLoss += loss.data[0]
+        trainLoss += loss.data  #[0]
 
         # backpropagate 
         loss.backward()
@@ -299,7 +299,7 @@ for epoch in range(numEpochs):
     output = model.forward(inputTest)
             
     # calculate loss on test set
-    testLoss = lossFunc.forward(output, testTargetVar).data[0]
+    testLoss = lossFunc.forward(output, testTargetVar).data  #[0]
 
     testLosses.append(testLoss)
     
