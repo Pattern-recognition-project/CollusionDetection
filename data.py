@@ -12,12 +12,14 @@ class Data:
 
     def __LoadData(self):
         print("Loading data...")
-        data = np.genfromtxt("./DB_Collusion_All_processed.csv", delimiter=",", skip_header=1)
+
+        data = np.genfromtxt(self.filePath, delimiter=",", skip_header=1)
 
         # create dataset
         self.dataset = np.array([data[data[:, 0] == i][:, 1] for i in np.unique(data[:, 0])], dtype=object)
+        self.ogdataset = np.array([data[data[:, 0] == i][:, -1] for i in np.unique(data[:, 0])], dtype=object)
         self.labels = np.array([data[data[:, 0] == i][0, 4] for i in np.unique(data[:, 0])], dtype=object)
-        self.country = np.array([data[data[:, 0] == i][0, -1] for i in np.unique(data[:, 0])], dtype=int)
+        self.country = np.array([data[data[:, 0] == i][0, -2] for i in np.unique(data[:, 0])], dtype=int)
 
         # create test and train data from shuffled dataset
         self.indices = np.arange(self.dataset.shape[0])
@@ -32,7 +34,6 @@ class Data:
         # self.testY = labels[testIndices]
 
         print("Data loaded")
-
 
     def __get_data(self, kind, indices):
 
@@ -55,10 +56,14 @@ class Data:
 
 
     def __proportion(self, arr):
+        if np.isnan(arr[0]):
+            # the original bid values could not be found
+            return [0 for i in range(10)]
 
         arr = sum([list(str(num)) for num in arr], [])
         counts = Counter(arr)
-        return [counts.get(str(i), 0) for i in range(10)]
+        total_digits = np.sum([counts.get(str(i),0) for i in range(10)])
+        return [counts.get(str(i), 0)/total_digits for i in range(10)]
 
     def __country(self):
         """
@@ -133,7 +138,7 @@ class Data:
                 [variation(x) for x in self.dataset],
                 [min(x) for x in self.dataset],
                 [max(x) for x in self.dataset],
-                *np.array([self.__proportion(x) for x in self.dataset]).transpose(),
+                *np.array([self.__proportion(x) for x in self.ogdataset]).transpose(),
                 *self.__country().transpose(),
                 self.__winner_auction(),
                 self.__average_auction()
@@ -167,11 +172,11 @@ class Data:
 
 if __name__ == "__main__":
 
-    data = Data("./DB_Collusion_All_processed.csv")
+    df = Data("./DB_Collusion_All_processed.csv")
 
-    agg_data = data.load_aggegrated(data_type='pandas', add_labels=True, min_bids=1)
+    agg_data = df.load_aggegrated(data_type='pandas', add_labels=True, min_bids=1)
 
-    # print(data.get_test_X())
+    # print(df.get_test_X())
 
 
     # print(agg_data)
@@ -179,11 +184,11 @@ if __name__ == "__main__":
     # agg_data.to_csv('test.csv')
 
     # with open("DB_Collusion_All_processed.obj","wb") as filehandler:
-    #     pickle.dump(data, filehandler)
+    #     pickle.dump(df, filehandler)
 
     # with open("DB_Collusion_All_processed.obj","rb") as filehandler:
-    #     data = pickle.load(filehandler)
+    #     df = pickle.load(filehandler)
 
 
-    margins = data.get_margins_per_country()
+    margins = df.get_margins_per_country()
     print(margins)
