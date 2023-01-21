@@ -14,6 +14,7 @@ import math
 
 
 
+print("version:", torch.__version__)
 
 
 class Net(nn.Module):
@@ -35,7 +36,7 @@ class Net(nn.Module):
         
         self.inputSideLayers = []
         for i in range(numLayersInputSide):
-            layer = nn.Linear(numInputs, widthInputSide)
+            layer = nn.Linear(numInputs, widthInputSide,dtype=torch.float64)
             self.inputSideLayers.append(layer)
             self.add_module("iLayer%d" % i, layer)
             
@@ -57,7 +58,7 @@ class Net(nn.Module):
             else:
                 numOutputs = widthOutputSide
             
-            layer = nn.Linear(numInputs, numOutputs)
+            layer = nn.Linear(numInputs, numOutputs,dtype=torch.float64)
             self.outputSideLayers.append(layer)
             self.add_module("oLayer%d" % i, layer)
             
@@ -99,7 +100,6 @@ class Net(nn.Module):
             # feed through the output side network
             h = output
             for layerIndex, layer in enumerate(self.outputSideLayers):
-                
                 h = layer(h)
 
                 # note: since we want to do regression, we do NOT 
