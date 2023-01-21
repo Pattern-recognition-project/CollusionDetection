@@ -108,6 +108,7 @@ class Net(nn.Module):
                 if layerIndex != len(self.outputSideLayers) - 1:
                     h = F.relu(h)
                 
+                
             outputs.append(h)
             
         # end of loop over minibatch entries

@@ -91,7 +91,6 @@ class Data:
 
 
 
-
     def get_margins_per_country(self):
 
         countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan']
@@ -113,6 +112,12 @@ class Data:
             )
 
         return pd.DataFrame(results)
+
+    def get_agg_train(self):
+
+        agg_data = self.load_aggegrated()
+
+        return agg_data[self.indices[:int(0.8 * agg_data.shape[0])]]
 
 
 
@@ -189,6 +194,5 @@ if __name__ == "__main__":
     # with open("DB_Collusion_All_processed.obj","rb") as filehandler:
     #     df = pickle.load(filehandler)
 
-
-    margins = df.get_margins_per_country()
-    print(margins)
+    # margins = data.get_margins_per_country()
+    # print(margins)

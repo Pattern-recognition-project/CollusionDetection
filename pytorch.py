@@ -122,6 +122,9 @@ for row in range(numRows):
     # convert to float32 to avoid problems with incompatible data types during training
     xvalues.append(xv.astype('float32'))
     
+
+
+
 # calculate ML estimators for each point
 mlEstimators = np.array([ np.var(xv, ddof = 0) for xv in xvalues], dtype = 'float32')
 
@@ -138,7 +141,7 @@ ubEstimators = np.array([ np.var(xv, ddof = 1) for xv in xvalues], dtype = 'floa
                                                test_size=0.20, random_state=42)
 
 
-
+print(inputTrain)
 
 # instantiate the model
 model = Net()
@@ -151,7 +154,7 @@ lossFunc = nn.MSELoss()
 minibatchSize = 32
 
 # number of training epochs
-numEpochs = 40
+numEpochs = 5 #40
 
 optimizer = optim.Adam(model.parameters(), lr = 0.0001)
 
@@ -216,7 +219,7 @@ for epoch in range(numEpochs):
     output = model.forward(inputTest)
             
     # calculate loss on test set
-    testLoss = lossFunc.forward(output, testTargetVar).data[0]
+    testLoss = lossFunc.forward(output, testTargetVar).data  #[0]
 
     testLosses.append(testLoss)
     
@@ -277,7 +280,7 @@ for epoch in range(numEpochs):
         loss = lossFunc.forward(output, thisTarget)
    
         # accumulate 
-        trainLoss += loss.data[0]
+        trainLoss += loss.data  #[0]
 
         # backpropagate 
         loss.backward()
@@ -296,7 +299,7 @@ for epoch in range(numEpochs):
     output = model.forward(inputTest)
             
     # calculate loss on test set
-    testLoss = lossFunc.forward(output, testTargetVar).data[0]
+    testLoss = lossFunc.forward(output, testTargetVar).data  #[0]
 
     testLosses.append(testLoss)
     
