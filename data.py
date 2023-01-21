@@ -119,6 +119,11 @@ class Data:
 
         return agg_data[self.indices[:int(0.8 * agg_data.shape[0])]]
 
+    def get_agg_test(self):
+
+        agg_data = self.load_aggegrated()
+
+        return agg_data[self.indices[int(0.8 * agg_data.shape[0]):]]
 
 
     def load_aggegrated(self, data_type='numpy', add_labels=False, min_bids=1):
@@ -188,8 +193,8 @@ if __name__ == "__main__":
 
     # agg_data.to_csv('test.csv')
 
-    # with open("DB_Collusion_All_processed.obj","wb") as filehandler:
-    #     pickle.dump(df, filehandler)
+    with open("DB_Collusion_All_processed.obj","wb") as filehandler:
+        pickle.dump(df, filehandler)
 
     # with open("DB_Collusion_All_processed.obj","rb") as filehandler:
     #     df = pickle.load(filehandler)
