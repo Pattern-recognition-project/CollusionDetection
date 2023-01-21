@@ -26,9 +26,9 @@ seed_torch()
 class Net(nn.Module):
     
     def __init__(self, 
-                 numLayersInputSide  =  5, 
-                 widthInputSide      = 30, 
-                 numLayersOutputSide = 5, 
+                 numLayersInputSide  =  3, 
+                 widthInputSide      = 10, 
+                 numLayersOutputSide = 8, 
                  widthOutputSide     = 30, 
                 ):
         
@@ -55,7 +55,7 @@ class Net(nn.Module):
         #----------
 
         # NETWORK 2
-        numNewfeatures = 0  # to add the new features as another input to the second model
+        numNewfeatures = 26 # to add the new features as another input to the second model
         numInputs = widthInputSide + numNewfeatures
         numOutputs = widthOutputSide
         
@@ -75,25 +75,20 @@ class Net(nn.Module):
         self.dropout = nn.Dropout(0.25)
     #----------------------------------------
     
-    def forward(self, points): #, added_features): # added_features are the variables like skewness, kurtosis, etc
+    def forward(self, points, added_features): # added_features are the variables like skewness, kurtosis, etc
         # points is one batch, so a collection of auctions: each auction is an array of arrays (the internal ones are the bids)
 
-    
-        
+
         # overall output for the entire minibatch
         outputs = []
         
         # loop over minibatch entries
-        for indexAuction, thisPoints in enumerate(points):         # loop on the auctions
+        for indexAuction, auction in enumerate(points):         # loop on the auctions
 
-
-            # outputs of each point of this minibatch entry
-            thisOutputs = [ ]
-            
-            # thisPoints is a list of 1D tensors (ogni bids è a sua volta un array)
+            # auction is a list of 1D tensors (ogni bids è a sua volta un array)
             # stack all input points into a 2D tensor
             # (the second dimension will have size 1)
-            h = np.stack(thisPoints)
+            h = np.stack(auction)
             
             h = Variable(torch.from_numpy(h)) # A PyTorch Variable is a wrapper around a PyTorch Tensor, 
                                               # and represents a node in a computational graph. If x is a Variable 
@@ -102,6 +97,7 @@ class Net(nn.Module):
             
             # forward all input points through the input side network
             # each auction passes through each layer and relu
+            # we are passing a vector (so a signel input) containing all the bids for each auction
             for layer in self.inputSideLayers:
                 h = layer(h)
                 h = F.relu(h)
@@ -110,35 +106,36 @@ class Net(nn.Module):
             # then divide by number of points
             # (it aggregates the output tensors of the first network).
 
-            output = h.sum(0) / len(thisPoints)
+            output = h.sum(0) / len(auction)
             
             # forward step of the second network
-            # here we should add added_features, an array of 26 elements for each auction
 
             # add dropout layer
             h = self.dropout(output)
 
+            # here we should add added_features, an array of 26 elements for each auction
+            new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
+            h = torch.cat((h,new_features))
 
-            # new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
-
+            # passing through the second network
             for layerIndex, layer in enumerate(self.outputSideLayers):
+                if layerIndex==0: # if we are in the first layer we have to consider the new features
+                    h = layer(h)
+                else:
+                    h = layer(h)
 
-                # if layerIndex==0: # if we are in the first layer we have to consider the new features
-                #     h = layer(h,new_features)
-                # else:
-                    # h = layer(h)
-
-                h= layer(h)
+                # h= layer(h)
                 
                 if layerIndex != len(self.outputSideLayers) - 1:
                     h = torch.relu(h) 
-                # else: 
-                #     h = torch.sigmoid(h) # to have values between 0 and 1 (needed if the chosen loss function is BCEloss)
-                
-            outputs.append(h)
+                else: 
+                    h = torch.sigmoid(h) # to have values between 0 and 1 (needed if the chosen loss function is BCEloss)
+
+            # contains the output for each auction in the present batch, so at the end should be of the same length of points 
+            outputs.append(h) 
             
         # end of loop over minibatch entries
-         
+        
         # convert the list of outputs to a torch 2D tensor
     
         return torch.cat(outputs, 0)            
