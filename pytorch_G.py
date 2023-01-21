@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 
 from torch_model_G import Net
 
-from training_function import training_function
+from training_function import training_function, binary_output
 
 
 def seed_torch(seed=1029):
@@ -31,10 +31,6 @@ def seed_torch(seed=1029):
     torch.backends.cudnn.deterministic = True
 seed_torch()
 
-def binary_output(output):
-    # actual binary predictions
-    out = output.detach().numpy()
-    return np.where(out>=0.5,1,0)
 
 if __name__ == "__main__":
 
@@ -54,15 +50,11 @@ if __name__ == "__main__":
     # consider features to be added for the second network
     added_features = data.load_aggegrated()
     added_featuresTrain = added_features[:len(inputTrain)]
+    added_featuresTest = added_features[len(inputTrain):]
 
 
-    #train the model
-    model, output, trainLosses, testLosses= training_function(4, 10, inputTrain, targetTrain, inputTest, targetTest)
-
-
-    predictions = binary_output(output)
-
-
+    # train the model
+    model, output, trainLosses, testLosses= training_function(4, 40, inputTrain, targetTrain, inputTest, targetTest, added_featuresTrain,added_featuresTest)
 
 
 
@@ -79,12 +71,16 @@ if __name__ == "__main__":
     plt.show()
 
     # metrics 
+    predictions = binary_output(output)
+
     true_pred = targetTest.astype(int)
 
     conf_matrix = confusion_matrix(true_pred,predictions)
     print("Confusion Matrix of the Test Set")
     print("-----------")
     print(conf_matrix)
+    print("-----------")
+
     print("Accuracy :\t"+str(accuracy_score(true_pred,predictions)))
     print("Precision :\t"+str(precision_score(true_pred,predictions)))
     print("Recall :\t"+str(recall_score(true_pred,predictions)))
