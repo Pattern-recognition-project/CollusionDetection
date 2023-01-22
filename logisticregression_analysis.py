@@ -8,7 +8,11 @@ from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.metrics import f1_score
 from sklearn.pipeline import Pipeline
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
 from data import Data
 
 def crossValidationLR(X,y,runs=10):
@@ -87,3 +91,24 @@ if __name__ == "__main__":
 
     train_report = classification_report(y_train, y_train_predict)
     test_report = classification_report(y_test, y_test_predict)
+
+    ## Plotting performance per nr. of bids.
+    bid_amounts = (x_test[:,0]*scaler.scale_[0] + scaler.mean_[0]).astype(int)
+    bid_amounts_scores = []
+    for bid_amount in np.unique(bid_amounts)[:11]:
+        idx = bid_amounts == bid_amount
+        bid_amounts_scores.append(f1_score(y_test[idx],y_test_predict[idx]))
+    idx = bid_amounts >= 13
+    bid_amounts_scores.append(f1_score(y_test[idx],y_test_predict[idx]))
+
+    fig, ax = plt.subplots()
+    markerline, _, _ = ax.stem(np.unique(bid_amounts)[:12], bid_amounts_scores, linefmt='grey', markerfmt='D')
+    markerline.set_markerfacecolor('none')
+    ax.set(xlim=(1,14), xticks=np.arange(2,14),
+           ylim=(-0.1,1.1), yticks=np.linspace(0,1,11))
+    plt.xlabel('Bids per auction', fontstyle='italic')
+    plt.ylabel('F1-score', fontstyle='italic')
+    plt.show()
+
+    ## Plotting performance per dataset.
+    
