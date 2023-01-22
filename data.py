@@ -118,13 +118,6 @@ class Data:
         agg_data = self.load_aggegrated()
 
         return agg_data[self.indices[:int(0.8 * agg_data.shape[0])]]
-    
-    def get_agg_test(self):
-
-        agg_data = self.load_aggegrated()
-
-        return agg_data[self.indices[int(0.8 * agg_data.shape[0]):]]
-
 
     def get_agg_test(self):
 
@@ -200,11 +193,11 @@ if __name__ == "__main__":
 
     # agg_data.to_csv('test.csv')
 
-    with open("DB_Collusion_All_processed.obj","wb") as filehandler:
-        pickle.dump(df, filehandler)
+    # with open("DB_Collusion_All_processed.obj","wb") as filehandler:
+    #     pickle.dump(df, filehandler)
 
-    with open("DB_Collusion_All_processed.obj","rb") as filehandler:
-        df = pickle.load(filehandler)
+    # with open("DB_Collusion_All_processed.obj","rb") as filehandler:
+    #     df = pickle.load(filehandler)
 
     # margins = data.get_margins_per_country()
     # print(margins)
