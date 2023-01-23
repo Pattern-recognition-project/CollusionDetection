@@ -7,8 +7,11 @@ from sklearn import model_selection
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import LearningCurveDisplay
 from sklearn.metrics import classification_report
 from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -111,4 +114,36 @@ if __name__ == "__main__":
     plt.show()
 
     ## Plotting performance per dataset.
-    
+    countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan']
+    country_scores = []
+    fig, axs = plt.subplots(3, 2, figsize=(4, 6), sharex=True, sharey=True)
+    axs = axs.flatten()
+    for i,  ax in enumerate(axs):
+        idx = x_test[:,i+18].astype(bool)
+        ConfusionMatrixDisplay.from_predictions(y_test[idx],y_test_predict[idx],cmap=plt.cm.Greens, ax=axs[i], colorbar=False)
+        axs[i].set_title(countries[i],fontsize='small',fontweight='semibold')
+        axs[i].set_xlabel('')
+        axs[i].set_ylabel('')
+
+
+
+    axs = axs.reshape(3,2)
+    fig.suptitle('Confusion Matrices per dataset.', fontstyle='italic', fontweight='book')
+    fig.supxlabel('Predicted Collusion', fontsize='medium', fontstyle='italic')
+    fig.supylabel('True Collusion', fontsize='medium', fontstyle='italic')
+    plt.show()
+
+    ## Plotting learning curves.
+    fig, ax = plt.subplots()
+    LearningCurveDisplay.from_estimator(LR_model,
+                                        x_train,
+                                        y_train,
+                                        train_sizes=np.linspace(0.01, 1.0, 1000),
+                                        n_jobs=4,
+                                        ax=ax,
+                                        score_type='both',
+                                        #line_kw={'marker':'o'},
+                                        cv=8,
+                                        score_name='F1-score',
+                                        scoring='f1',
+                                        std_display_style=None)

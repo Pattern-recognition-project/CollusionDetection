@@ -41,8 +41,8 @@ class GRUHyperModel(kt.HyperModel):
         model.add(tf.keras.layers.Normalization(axis=None, mean=mean, variance=var))
         model.add(tf.keras.layers.Input(shape=(trainData.shape[1], trainData.shape[2])))
         model.add(tf.keras.layers.Masking(mask_value=-1)) 
-        model.add(tf.keras.layers.GRU(hp.Int('GRU units', min_value=32, max_value=512, step=32), input_shape=(trainData.shape[1], trainData.shape[2])))
-        model.add(tf.keras.layers.Dense(hp.Int('Dense units', min_value=32, max_value=512, step=32), activation='relu'))
+        model.add(tf.keras.layers.GRU(hp.Int('GRU_units', min_value=32, max_value=512, step=32), input_shape=(trainData.shape[1], trainData.shape[2])))
+        model.add(tf.keras.layers.Dense(hp.Int('Dense_units', min_value=32, max_value=512, step=32), activation='relu'))
         model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 
         # Compile and train the model
@@ -52,15 +52,18 @@ class GRUHyperModel(kt.HyperModel):
         return model
 
 # Instantiate the tuner and perform hypertuning
-tuner = kt.Hyperband(GRUHyperModel.model_builder, objective='val_loss', max_epochs=10, factor=3)
-tuner.search(trainData, trainLabels, epochs=10, validation_split=0.2)
+tuner = kt.Hyperband(GRUHyperModel.model_builder, objective='val_accuracy', max_epochs=50, factor=3, directory='GRU_tuner', project_name='GRU_')
+# tuner.search(trainData, trainLabels, epochs=50, validation_split=0.2)
 
 best_hps=tuner.get_best_hyperparameters(num_trials=1)[0]
 print(best_hps)
-print(f"Done tuning:\nnumber of GRU units: {best_hps.get('GRU units')}\nnumber of Dense units: {best_hps.get('Dense units')}\nlearning rate: {best_hps.get('learning_rate')}")
+print(f"Done tuning:\nnumber of GRU units: {best_hps.get('GRU_units')}\nnumber of Dense units: {best_hps.get('Dense_units')}\nlearning rate: {best_hps.get('learning_rate')}")
 
 
+model: tf.keras.Model = tuner.hypermodel.build(best_hps)
+print(f"start training ^ with traindata of shape: {trainData.shape} and trainlabels of shape: {trainLabels.shape}")
 
+history = model.fit(trainData, trainLabels, epochs=20, verbose=1, batch_size=BATCH_SIZE, validation_split=0.2)
 
 
 # print(f"start training ^ with traindata of shape: {trainData.shape} and trainlabels of shape: {trainLabels.shape}")
@@ -68,8 +71,11 @@ print(f"Done tuning:\nnumber of GRU units: {best_hps.get('GRU units')}\nnumber o
 history = model.fit(trainData, trainLabels, epochs=10, verbose=1, batch_size=BATCH_SIZE)
 
 # print(f"predicting on: {trainData[4]} and {trainData[5]}")
-# print(f"expecting: {trainLabels[4]} and {trainLabels[5]}")
 
-# print(f"shape of traindata4: {trainData[4]} and type is: {type(trainData[4])}")
 
-# print(model.predict(np.array([trainData[4], trainData[5]])))
+print("prediciton: ")
+print(model.predict(np.array([trainData[4], trainData[5]])))
+print(f"expecting: {trainLabels[4]} and {trainLabels[5]}")
+
+# Plot the training results
+PlotResults(history)
