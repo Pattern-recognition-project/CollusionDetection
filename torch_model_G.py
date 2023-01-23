@@ -26,10 +26,10 @@ seed_torch()
 class Net(nn.Module):
     
     def __init__(self, 
-                 numLayersInputSide  =  3, 
+                 numLayersInputSide  =  10, 
                  widthInputSide      = 10, 
-                 numLayersOutputSide = 8, 
-                 widthOutputSide     = 30, 
+                 numLayersOutputSide = 5, 
+                 widthOutputSide     = 50, 
                 ):
         
         super(Net, self).__init__()
@@ -100,7 +100,7 @@ class Net(nn.Module):
             # we are passing a vector (so a signel input) containing all the bids for each auction
             for layer in self.inputSideLayers:
                 h = layer(h)
-                h = F.relu(h)
+                h = torch.relu(h)
                             
             # average the input side network outputs: sum along first dimension (point index), 
             # then divide by number of points
@@ -113,13 +113,12 @@ class Net(nn.Module):
             # add dropout layer
             h = self.dropout(output)
 
-            # here we should add added_features, an array of 26 elements for each auction
-            new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
-            h = torch.cat((h,new_features))
-
+            
             # passing through the second network
             for layerIndex, layer in enumerate(self.outputSideLayers):
                 if layerIndex==0: # if we are in the first layer we have to consider the new features
+                    new_features = Variable(torch.from_numpy(np.asarray(added_features[indexAuction])))
+                    h = torch.cat((h,new_features))
                     h = layer(h)
                 else:
                     h = layer(h)

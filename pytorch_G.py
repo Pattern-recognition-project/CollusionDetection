@@ -6,7 +6,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import math
-
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,7 +16,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, recall_s
 from sklearn.model_selection import train_test_split
 
 from torch_model_G import Net
-
+from sklearn.preprocessing import StandardScaler
 from training_function import training_function, binary_output
 
 
@@ -48,13 +48,23 @@ if __name__ == "__main__":
     inputTest = [[[value] for value in auction] for auction in inputTest]
 
     # consider features to be added for the second network
-    added_features = data.load_aggegrated()
-    added_featuresTrain = added_features[:len(inputTrain)]
-    added_featuresTest = added_features[len(inputTrain):]
+    added_features = data.load_aggegrated(data_type="pandas")
+    added_featuresTrain = data.get_agg_train()
+    added_featuresTest = data.get_agg_test()
+
+    scaler = StandardScaler()
+    added_featuresTrain = scaler.fit_transform(added_featuresTrain)#[:,:18]
+    added_featuresTest = scaler.transform(added_featuresTest)#[:,:18]
+
+
+    # get learning rate from tuning
+    params = pd.read_csv("tuning_params.csv")
+    lr = params.loc[np.argmin(params['value']), 'params_lr']
 
 
     # train the model
-    model, output, trainLosses, testLosses= training_function(4, 40, inputTrain, targetTrain, inputTest, targetTest, added_featuresTrain,added_featuresTest)
+    # sembra fare meglio con 32 batches rispetto a 4
+    model, output, trainLosses, testLosses= training_function(16, 100, inputTrain, targetTrain, inputTest, targetTest, added_featuresTrain,added_featuresTest, lr)
 
 
 

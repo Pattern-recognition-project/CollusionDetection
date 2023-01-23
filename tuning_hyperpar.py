@@ -14,7 +14,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, recall_score, precision_score
 from sklearn.model_selection import train_test_split, cross_val_score
-
+from sklearn.preprocessing import StandardScaler
 from torch_model_G import Net
 import random
 import os
@@ -65,23 +65,32 @@ targetTest = data.get_test_y()
 inputTrain = [[[value] for value in auction] for auction in inputTrain]
 inputTest = [[[value] for value in auction] for auction in inputTest]
 
+# consider features to be added for the second network
+# added_features = data.load_aggegrated()
+added_featuresTrain = data.get_agg_train()
+added_featuresTest = data.get_agg_test()
+scaler = StandardScaler()
+added_featuresTrain = scaler.fit_transform(added_featuresTrain)
+added_featuresTest = scaler.transform(added_featuresTest)
 
 def objective(trial):
 
-    # bs = trial.suggest_int("batchSize", 4, 64, log=True)
     lr = trial.suggest_float("lr", 0.00001, 0.1, log=True)
-    model, output, trainLosses, testLosses= training_function(4, 11, inputTrain, targetTrain, inputTest, targetTest, lr)
+    model, output, trainLosses, testLosses= training_function(32, 60, inputTrain, targetTrain, inputTest, targetTest,added_featuresTrain, added_featuresTest,lr)
 
-    output = binary_output(output)
+    # output = binary_output(output)
+    # targetTest_int = data.get_test_y().astype(int)
+    targetTest_tensor = Variable(torch.from_numpy(np.stack(targetTest)))
+    BCE = nn.BCELoss()
 
-    targetTest_int = data.get_test_y().astype(int)
+    l = BCE(output, targetTest_tensor)
 
-    acc = accuracy_score(targetTest_int, output)
-    return acc
+    return l
 
 
-study = optuna.create_study(direction="maximize")
-study.optimize(objective, n_trials=50)
+study = optuna.create_study(direction="minimize")
+study.optimize(objective, n_trials=20)
+
 found_param = study.trials_dataframe()
 found_param.to_csv(f"tuning_params.csv")
 
