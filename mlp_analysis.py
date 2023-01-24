@@ -39,9 +39,9 @@ if __name__ == "__main__":
     x_test = x_test.astype('float32')
 
     # Define the MLP model
-    DROPOUT = 0.0
+    DROPOUT = 0.25
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Input(shape=(agg_data_train.shape[1])))
+    model.add(tf.keras.layers.Input(shape=(x_train.shape[1])))
     model.add(tf.keras.layers.Dense(64, activation='relu'))
     model.add(tf.keras.layers.Dropout(DROPOUT))
     model.add(tf.keras.layers.Dense(128, activation='relu'))
@@ -51,20 +51,17 @@ if __name__ == "__main__":
     model.add(tf.keras.layers.Dense(32, activation='relu'))
     model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss=tf.keras.losses.BinaryCrossentropy(), metrics=['accuracy'])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), loss=tf.keras.losses.BinaryCrossentropy(), metrics=['accuracy'])
 
     model.summary()
-
-
-    # print(f"start training ^ with traindata of shape: {trainData.shape} and trainlabels of shape: {trainLabels.shape}")
 
     history = model.fit(
         x_train,
         y_train,
-        epochs=30,
+        epochs=50,
         verbose=1,
         batch_size=BATCH_SIZE,
-        validation_)
+        validation_split=0.2)
 
     PlotResults(history, validation=True)
 
