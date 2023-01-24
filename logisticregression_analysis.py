@@ -116,18 +116,21 @@ if __name__ == "__main__":
     ## Plotting performance per dataset.
     countries = ['Brazil','Italy','America','Switzerland_GR_SG','Switzerland_Ticino','Japan']
     country_scores = []
-    fig, axs = plt.subplots(3, 2, figsize=(4, 6), sharex=True, sharey=True)
+    fig, axs = plt.subplots(4, 2, figsize=(4, 7), sharex=True, sharey=True)
     axs = axs.flatten()
-    for i,  ax in enumerate(axs):
+    for i in range(6):
         idx = x_test[:,i+18].astype(bool)
         ConfusionMatrixDisplay.from_predictions(y_test[idx],y_test_predict[idx],cmap=plt.cm.Greens, ax=axs[i], colorbar=False)
         axs[i].set_title(countries[i],fontsize='small',fontweight='semibold')
         axs[i].set_xlabel('')
         axs[i].set_ylabel('')
+    ConfusionMatrixDisplay.from_predictions(y_test,y_test_predict,cmap=plt.cm.Purples, ax=axs[6], colorbar=False)
+    axs[6].set_title('All',fontsize='small',fontweight='semibold')
+    axs[6].set_xlabel('')
+    axs[6].set_ylabel('')
 
 
-
-    axs = axs.reshape(3,2)
+    axs = axs.reshape(4,2)
     fig.suptitle('Confusion Matrices per dataset.', fontstyle='italic', fontweight='book')
     fig.supxlabel('Predicted Collusion', fontsize='medium', fontstyle='italic')
     fig.supylabel('True Collusion', fontsize='medium', fontstyle='italic')
