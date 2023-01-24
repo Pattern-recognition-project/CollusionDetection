@@ -26,10 +26,10 @@ seed_torch()
 class Net(nn.Module):
 
     def __init__(self,
-                 numLayersInputSide  =  10,
-                 widthInputSide      = 10,
-                 numLayersOutputSide = 5,
-                 widthOutputSide     = 50,
+                 numLayersInputSide  = 3,
+                 widthInputSide      = 16,
+                 numLayersOutputSide = 4,
+                 widthOutputSide     = [128,64,32],
                 ):
 
         super(Net, self).__init__()
@@ -56,23 +56,21 @@ class Net(nn.Module):
 
         # NETWORK 2
         numNewfeatures = 24 # to add the new features as another input to the second model
-        numInputs = widthInputSide + numNewfeatures
-        numOutputs = widthOutputSide
+        numInputs = [widthInputSide + numNewfeatures] + widthOutputSide
 
         self.outputSideLayers = []
         for i in range(numLayersOutputSide):
 
             if i == numLayersOutputSide - 1:
-                numOutputs = 1
+                layer = nn.Linear(widthOutputSide[-1], 1, dtype=torch.float64)
+                self.outputSideLayers.append(layer)
+                self.add_module("oLayer%d" % i, layer)
             else:
-                numOutputs = widthOutputSide
+                layer = nn.Linear(numInputs[i], widthOutputSide[i], dtype=torch.float64)
+                self.outputSideLayers.append(layer)
+                self.add_module("oLayer%d" % i, layer)
 
-            layer = nn.Linear(numInputs, numOutputs, dtype=torch.float64)
-            self.outputSideLayers.append(layer)
-            self.add_module("oLayer%d" % i, layer)
-
-            numInputs = numOutputs
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.0)
     #----------------------------------------
 
     def forward(self, points, added_features): # added_features are the variables like skewness, kurtosis, etc

@@ -67,11 +67,11 @@ if __name__ == "__main__":
 
     model, output,output_train, trainLosses, testLosses= training_function(16,
                                                               50,
-                                                              x_bids_train,
-                                                              y_train,
-                                                              x_bids_test,
-                                                              y_test,
-                                                              x_train.astype('float32'),
+                                                              x_bids_train[:int(0.8 *len(x_bids_train))],
+                                                              y_train[:int(0.8 *len(x_bids_train))],
+                                                              x_bids_train[int(0.8 *len(x_bids_train)):], #x_test_train
+                                                              y_train[int(0.8 *len(x_bids_train)):], #y_test_train
+                                                              x_train[:int(0.8 *len(x_bids_train)),:].astype('float32'),
                                                               x_test.astype('float32'),
                                                               0.01)
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     plt.title('Loss vs Epochs')
     plt.xlabel('Epochs')
     plt.ylabel('loss')
-    plt.legend(["train loss", "test loss"])
+    plt.legend(["train loss", "val loss"])
     plt.show()
 
     # metrics

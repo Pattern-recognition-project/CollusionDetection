@@ -58,7 +58,7 @@ if __name__ == "__main__":
     x_test = x_test.astype('float32')
 
     # build and train model.
-    DROPOUT = 0.25
+    DROPOUT = 0.5
     bidding_input = tf.keras.layers.Input(shape=(x_bids_train.shape[1], x_bids_train.shape[2]))
     masking = tf.keras.layers.Masking(mask_value=-100)(bidding_input)
     gru = tf.keras.layers.GRU(64, input_shape=(x_bids_train.shape[1], x_bids_train.shape[2]),dropout=DROPOUT, recurrent_dropout=DROPOUT)(masking)
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     model.summary()
 
-    history = model.fit([x_bids_train, x_train], y_train, epochs=80, verbose=1, batch_size=BATCH_SIZE, validation_split=0.2)
+    history = model.fit([x_bids_train, x_train], y_train, epochs=50, verbose=1, batch_size=BATCH_SIZE, validation_split=0.2)
 
     PlotResults(history, validation=True)
 
