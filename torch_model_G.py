@@ -70,7 +70,7 @@ class Net(nn.Module):
                 self.outputSideLayers.append(layer)
                 self.add_module("oLayer%d" % i, layer)
 
-        self.dropout = nn.Dropout(0.0)
+        self.dropout = nn.Dropout(0.25)
     #----------------------------------------
 
     def forward(self, points, added_features): # added_features are the variables like skewness, kurtosis, etc

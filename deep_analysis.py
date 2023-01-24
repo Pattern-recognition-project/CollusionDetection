@@ -66,12 +66,12 @@ if __name__ == "__main__":
     y_test = y_test
 
     model, output,output_train, trainLosses, testLosses= training_function(16,
-                                                              50,
-                                                              x_bids_train[:int(0.8 *len(x_bids_train))],
-                                                              y_train[:int(0.8 *len(x_bids_train))],
-                                                              x_bids_train[int(0.8 *len(x_bids_train)):], #x_test_train
-                                                              y_train[int(0.8 *len(x_bids_train)):], #y_test_train
-                                                              x_train[:int(0.8 *len(x_bids_train)),:].astype('float32'),
+                                                              20,
+                                                              x_bids_train,
+                                                              y_train,
+                                                              x_bids_test, #x_test_train
+                                                              y_test, #y_test_train
+                                                              x_train.astype('float32'),
                                                               x_test.astype('float32'),
                                                               0.01)
 
@@ -90,6 +90,8 @@ if __name__ == "__main__":
     # metrics
     y_test_predict = binary_output(output)
     y_train_predict = binary_output(output_train)
+    y_train = y_train.astype(int)
+    y_test = y_test.astype(int)
 
     train_report = classification_report(y_train.astype(int), y_train_predict)
     test_report = classification_report(y_test.astype(int), y_test_predict)
