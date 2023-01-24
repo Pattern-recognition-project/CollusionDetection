@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     # train the model
     # sembra fare meglio con 32 batches rispetto a 4
-    model, output, trainLosses, testLosses= training_function(16, 100, inputTrain, targetTrain, inputTest, targetTest, added_featuresTrain,added_featuresTest, lr)
+    model, output, output_train, trainLosses, testLosses= training_function(16, 100, inputTrain, targetTrain, inputTest, targetTest, added_featuresTrain,added_featuresTest, lr)
 
 
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     plt.legend(["train loss", "test loss"])
     plt.show()
 
-    # metrics 
+    # metrics
     predictions = binary_output(output)
 
     true_pred = targetTest.astype(int)
@@ -95,5 +95,3 @@ if __name__ == "__main__":
     print("Precision :\t"+str(precision_score(true_pred,predictions)))
     print("Recall :\t"+str(recall_score(true_pred,predictions)))
     print("F1 Score :\t"+str(f1_score(true_pred,predictions)))
-        
-

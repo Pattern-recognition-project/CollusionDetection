@@ -7,7 +7,7 @@ from torch.autograd import Variable
 import operator
 
 import numpy as np
-import random 
+import random
 import os
 import matplotlib.pyplot as plt
 import math
@@ -24,64 +24,64 @@ def seed_torch(seed=1029):
 seed_torch()
 
 class Net(nn.Module):
-    
-    def __init__(self, 
-                 numLayersInputSide  =  10, 
-                 widthInputSide      = 10, 
-                 numLayersOutputSide = 5, 
-                 widthOutputSide     = 50, 
+
+    def __init__(self,
+                 numLayersInputSide  =  10,
+                 widthInputSide      = 10,
+                 numLayersOutputSide = 5,
+                 widthOutputSide     = 50,
                 ):
-        
+
         super(Net, self).__init__()
-        
+
         #----------
         # input side layers
         #----------
-            
+
         # NETWORK 1
         numInputs = 1
-        
+
         self.inputSideLayers = []
-     
-        for i in range(numLayersInputSide): 
+
+        for i in range(numLayersInputSide):
             layer = nn.Linear(numInputs, widthInputSide, dtype=torch.float64)
             self.inputSideLayers.append(layer)
             self.add_module("iLayer%d" % i, layer)
-            
-            numInputs = widthInputSide 
+
+            numInputs = widthInputSide
 
         #----------
         # output side layers
         #----------
 
         # NETWORK 2
-        numNewfeatures = 26 # to add the new features as another input to the second model
+        numNewfeatures = 24 # to add the new features as another input to the second model
         numInputs = widthInputSide + numNewfeatures
         numOutputs = widthOutputSide
-        
+
         self.outputSideLayers = []
         for i in range(numLayersOutputSide):
-        
+
             if i == numLayersOutputSide - 1:
                 numOutputs = 1
             else:
                 numOutputs = widthOutputSide
-            
+
             layer = nn.Linear(numInputs, numOutputs, dtype=torch.float64)
             self.outputSideLayers.append(layer)
             self.add_module("oLayer%d" % i, layer)
-            
-            numInputs = numOutputs 
-        self.dropout = nn.Dropout(0.25)
+
+            numInputs = numOutputs
+        self.dropout = nn.Dropout(0.5)
     #----------------------------------------
-    
+
     def forward(self, points, added_features): # added_features are the variables like skewness, kurtosis, etc
         # points is one batch, so a collection of auctions: each auction is an array of arrays (the internal ones are the bids)
 
 
         # overall output for the entire minibatch
         outputs = []
-        
+
         # loop over minibatch entries
         for indexAuction, auction in enumerate(points):         # loop on the auctions
 
@@ -89,31 +89,31 @@ class Net(nn.Module):
             # stack all input points into a 2D tensor
             # (the second dimension will have size 1)
             h = np.stack(auction)
-            
-            h = Variable(torch.from_numpy(h)) # A PyTorch Variable is a wrapper around a PyTorch Tensor, 
-                                              # and represents a node in a computational graph. If x is a Variable 
-                                              # then x.data is a Tensor giving its value, and x.grad is another Variable 
+
+            h = Variable(torch.from_numpy(h)) # A PyTorch Variable is a wrapper around a PyTorch Tensor,
+                                              # and represents a node in a computational graph. If x is a Variable
+                                              # then x.data is a Tensor giving its value, and x.grad is another Variable
                                               # holding the gradient of x with respect to some scalar value.
-            
+
             # forward all input points through the input side network
             # each auction passes through each layer and relu
             # we are passing a vector (so a signel input) containing all the bids for each auction
             for layer in self.inputSideLayers:
                 h = layer(h)
                 h = torch.relu(h)
-                            
-            # average the input side network outputs: sum along first dimension (point index), 
+
+            # average the input side network outputs: sum along first dimension (point index),
             # then divide by number of points
             # (it aggregates the output tensors of the first network).
 
             output = h.sum(0) / len(auction)
-            
+
             # forward step of the second network
 
             # add dropout layer
             h = self.dropout(output)
 
-            
+
             # passing through the second network
             for layerIndex, layer in enumerate(self.outputSideLayers):
                 if layerIndex==0: # if we are in the first layer we have to consider the new features
@@ -124,21 +124,17 @@ class Net(nn.Module):
                     h = layer(h)
 
                 # h= layer(h)
-                
+
                 if layerIndex != len(self.outputSideLayers) - 1:
-                    h = torch.relu(h) 
-                else: 
+                    h = torch.relu(h)
+                else:
                     h = torch.sigmoid(h) # to have values between 0 and 1 (needed if the chosen loss function is BCEloss)
 
-            # contains the output for each auction in the present batch, so at the end should be of the same length of points 
-            outputs.append(h) 
-            
+            # contains the output for each auction in the present batch, so at the end should be of the same length of points
+            outputs.append(h)
+
         # end of loop over minibatch entries
-        
+
         # convert the list of outputs to a torch 2D tensor
-    
-        return torch.cat(outputs, 0)            
 
-
-
-
+        return torch.cat(outputs, 0)
