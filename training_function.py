@@ -13,7 +13,7 @@ from torch.autograd import Variable
 import os
 import random
 
-from torch_model_G import Net
+from nested_mlp_model import Net
 
 def seed_torch(seed=1029):
     random.seed(seed)

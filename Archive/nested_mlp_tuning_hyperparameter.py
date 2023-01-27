@@ -19,7 +19,7 @@ from torch_model_G import Net
 import random
 import os
 from training_function import training_function
-from pytorch_G import binary_output
+from nested_mlp import binary_output
 import torch.optim as optim
 from ray import tune
 import optuna

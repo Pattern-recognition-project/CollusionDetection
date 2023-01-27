@@ -19,7 +19,7 @@ from torch.autograd import Variable
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from torch_model_G import Net
+from nested_mlp_model import Net
 from data import Data
 from training_function import training_function, binary_output
 
