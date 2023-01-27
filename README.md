@@ -2,9 +2,9 @@
 > This repo contains code for cartel detection using 3 different type of neural network models:
 
 <div style = "display: flex; justify-content: center;">
-    <img src="./images/mlp_visualization.png" style = "padding: 10px" alt="MLP Model" width="33%" height="auto" /> 
-    <img src="./images/nested_mlp_visualization.png" style = "padding: 10px" alt="Nested MLP Model" width="33%" height="auto" /> 
-    <img src="./images/recurrent_visualization.png" style = "padding: 10px" alt="Recurrent Model" width="33%" height="auto" /> 
+    <img src="./images/mlp_visualization.png" style = "padding: 10px" alt="MLP Model" width="30%" height="auto" /> 
+    <img src="./images/nested_mlp_visualization.png" style = "padding: 10px" alt="Nested MLP Model" width="30%" height="auto" /> 
+    <img src="./images/recurrent_visualization.png" style = "padding: 10px" alt="Recurrent Model" width="30%" height="auto" /> 
 </div>
 
 ## Files
