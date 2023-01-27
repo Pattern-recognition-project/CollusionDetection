@@ -9,12 +9,14 @@
 
 ## Files
 - files containing the models used for the results in the paper:
-    - [logisticregression_analysis.py](./logisticregression_analysis.py)
-    - [mlp_analysis.py](./mlp_analysis.py)
-    - [recurrent_analysis.py](./recurrent_analysis.py)
-    - [nested_mlp_analysis.py](./nested_mlp_analysis.py) (Also uses: [training_function](./training_function.py))
+    - [logisticregression_analysis](./logisticregression_analysis.py)
+    - [mlp_analysis](./mlp_analysis.py)
+    - [recurrent_analysis](./recurrent_analysis.py)
+    - [nested_mlp_analysis](./nested_mlp_analysis.py) (Also uses: [training_function](./training_function.py))
 
-- Discriptive statics are gatherd in [exploratory_analysis.py](./exploratory_analysis.py)
+- Discriptive statics are gatherd in [exploratory_analysis](./exploratory_analysis.py)
+
+- Data preprocessing can be found in [data_preprocessing](./data_preprocessing.py)
 
 - [tensorflow_helpers](./tensorflow_helpers.py) contains a function to plot results of a fitted tensorflow model.
 
